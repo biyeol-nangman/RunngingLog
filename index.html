@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RUNNING LOG</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --mute: #8a8a8a;
+      --line: #262626;
+      --neon: #39FF14;
+      --out: #F7EC0A;
+      --in: #0AEBF7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { color-scheme: dark; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Helvetica Neue", Helvetica, Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; color: inherit; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 72px; }
+
+    /* ---------- 상단 ---------- */
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { font-size: 34px; letter-spacing: .12em; text-transform: uppercase; font-weight: 300; line-height: 1.2; }
+    .sub { color: var(--mute); font-size: 12px; letter-spacing: .04em; }
+
+    /* ---------- 버튼 ---------- */
+    .btn {
+      background: var(--neon);
+      color: #000;
+      border: 1px solid var(--neon);
+      padding: 12px 22px;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 0;
+    }
+    .btn:hover { filter: brightness(.88); }
+    .btn.ghost { background: transparent; color: var(--fg); border-color: #444; font-weight: 500; }
+    .btn.ghost:hover { border-color: #fff; filter: none; }
+    .btn.small { padding: 9px 16px; }
+    .btn:disabled { opacity: .35; cursor: default; filter: none; }
+    .btn:focus-visible, .cell:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    /* ---------- 월 이동 ---------- */
+    .monthbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 28px 0 18px;
+    }
+    .monthbar h1 { font-size: 34px; font-weight: 300; letter-spacing: .02em; }
+    .nav { display: flex; gap: 8px; }
+    .nav .btn { padding: 10px 16px; }
+
+    /* ---------- 캘린더 ---------- */
+    .cal {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .dow {
+      background: #000;
+      padding: 10px 8px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      color: var(--mute);
+      text-align: left;
+    }
+    .cell {
+      background: #000;
+      min-height: 104px;
+      padding: 8px 8px 10px;
+      text-align: left;
+      border: 0;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .cell:hover { background: #0d0d0d; }
+    .cell.out { color: #3d3d3d; cursor: default; }
+    .cell.out:hover { background: #000; }
+
+    .num {
+      display: inline-block;
+      align-self: flex-start;
+      min-width: 22px;
+      padding: 1px 5px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .cell.outdoor { --c: var(--out); --cbg: rgba(247, 236, 10, .09); }
+    .cell.indoor  { --c: var(--in);  --cbg: rgba(10, 235, 247, .09); }
+    .cell.rec { background: var(--cbg); box-shadow: inset 0 3px 0 var(--c); }
+    .cell.rec:hover { background: var(--cbg); filter: brightness(1.25); }
+
+    .cell.today { box-shadow: inset 0 0 0 1px var(--neon); }
+    .cell.rec.today { box-shadow: inset 0 3px 0 var(--c), inset 0 0 0 1px var(--neon); }
+    .cell.today .num { background: var(--neon); color: #000; font-weight: 700; }
+
+    .dist { font-size: 20px; font-weight: 300; color: var(--c); letter-spacing: -.01em; line-height: 1.15; }
+    .dist small { font-size: 10px; margin-left: 2px; letter-spacing: .08em; }
+    .meta {
+      font-size: 11px;
+      color: #bdbdbd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 14px;
+      font-size: 11px;
+      letter-spacing: .1em;
+      color: var(--mute);
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .legend i { display: inline-block; width: 10px; height: 10px; }
+    .legend .l-out { background: var(--out); }
+    .legend .l-in { background: var(--in); }
+    .legend .l-today { border: 1px solid var(--neon); background: transparent; }
+
+    /* ---------- 통계 ---------- */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--mute);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      margin: 48px 0 20px;
+    }
+
+    .stats { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; align-items: end; }
+    .stat .lbl { display: block; font-size: 11px; letter-spacing: .14em; color: var(--mute); margin-bottom: 6px; }
+    .stat .big { font-size: 56px; font-weight: 200; line-height: 1; letter-spacing: -.02em; }
+    .stat .big small { font-size: 14px; margin-left: 6px; letter-spacing: .1em; color: var(--mute); font-weight: 400; }
+    .stat .mid { font-size: 26px; font-weight: 300; }
+    .stat .mid small { font-size: 12px; color: var(--mute); margin-left: 4px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      font-size: 11px;
+      letter-spacing: .12em;
+      font-weight: 400;
+      color: var(--mute);
+      text-align: right;
+      padding: 0 0 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    th:first-child, td:first-child { text-align: left; }
+    td { padding: 13px 0; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+    td:first-child { font-weight: 500; }
+    tr.zero td { color: #5a5a5a; }
+    .gone { font-size: 11px; color: var(--mute); margin-left: 6px; font-weight: 400; }
+    .empty { color: var(--mute); padding: 10px 0; }
+
+    /* ---------- 목록 관리 ---------- */
+    .manage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    @media (max-width: 900px) { .manage { grid-template-columns: 1fr; } }
+    .panel { border: 1px solid var(--line); padding: 22px; }
+    .panel h3 { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+    .items { list-style: none; margin-bottom: 16px; }
+    .items li { border-bottom: 1px solid var(--line); }
+    .items label { display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; }
+    .addrow { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 14px; }
+
+    .chk {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1px solid #666;
+      background: #000;
+      cursor: pointer;
+      position: relative;
+      flex: none;
+      border-radius: 0;
+    }
+    .chk:checked { background: var(--neon); border-color: var(--neon); }
+    .chk:checked::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      width: 5px;
+      height: 10px;
+      border: solid #000;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .chk:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    /* ---------- 입력 요소 ---------- */
+    input[type="text"], input[type="number"], select {
+      background: #000;
+      color: #fff;
+      border: 0;
+      border-bottom: 1px solid #555;
+      padding: 10px 2px;
+      font: inherit;
+      border-radius: 0;
+      width: 100%;
+    }
+    input:focus, select:focus { outline: 0; border-bottom-color: #fff; }
+    input::placeholder { color: #5f5f5f; }
+
+    /* ---------- 모달 ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      background: rgba(0, 0, 0, .8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .overlay[hidden] { display: none; }
+    .modal {
+      width: min(440px, 100%);
+      max-height: 100%;
+      overflow: auto;
+      background: #000;
+      border: 1px solid #333;
+      padding: 28px;
+    }
+    .mhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .mhead h2 { font-size: 20px; font-weight: 300; letter-spacing: .04em; }
+    .x { background: none; border: 0; font-size: 18px; color: var(--mute); cursor: pointer; padding: 4px 8px; }
+    .x:hover { color: #fff; }
+
+    .field { display: block; margin-bottom: 20px; border: 0; }
+    .field .lbl, .field legend {
+      display: block;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--mute);
+      margin-bottom: 6px;
+      padding: 0;
+    }
+    .field[hidden] { display: none; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #444; }
+    .seg label { position: relative; cursor: pointer; }
+    .seg input { position: absolute; opacity: 0; inset: 0; }
+    .seg span { display: block; padding: 11px; text-align: center; font-size: 13px; letter-spacing: .1em; }
+    .seg span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; }
+    .seg .o::before { background: var(--out); }
+    .seg .i::before { background: var(--in); }
+    .seg input:checked + .o { background: var(--out); color: #000; font-weight: 600; }
+    .seg input:checked + .i { background: var(--in); color: #000; font-weight: 600; }
+    .seg input:checked + span::before { background: #000; }
+    .seg input:focus-visible + span { outline: 2px solid #fff; outline-offset: -4px; }
+
+    .err { min-height: 20px; color: #ff6b6b; font-size: 12px; margin-bottom: 8px; }
+    .actions { display: flex; gap: 10px; }
+    .actions .btn:first-child { flex: 1; }
+
+    .note { color: var(--mute); font-size: 12px; margin-top: 56px; line-height: 1.8; }
+    #warn { color: #ff6b6b; font-size: 12px; margin-top: 8px; }
+
+    /* ---------- 모바일 ---------- */
+    @media (max-width: 640px) {
+      .wrap { padding: 20px 12px 56px; }
+      .sub { display: none; }
+      .brand { font-size: 24px; }
+      .monthbar h1 { font-size: 24px; }
+      .cell { min-height: 66px; padding: 5px 4px 6px; }
+      .num { font-size: 11px; min-width: 18px; padding: 1px 3px; }
+      .dist { font-size: 13px; }
+      .dist small { display: none; }
+      .meta { font-size: 9px; }
+      .meta.type, .meta.loc, .meta.time { display: none; }
+      .dow { padding: 8px 4px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat:first-child { grid-column: 1 / -1; }
+      .stat .big { font-size: 44px; }
+      .manage { grid-template-columns: 1fr; }
+      th, td { font-size: 12px; }
+      .modal { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">Running Log</div>
+      <div class="sub">직장인 러너를 위한 캘린더 기록</div>
+    </header>
+
+    <div class="monthbar">
+      <h1 id="monthTitle"></h1>
+      <div class="nav">
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="이전 달">←</button>
+        <button class="btn" id="todayBtn" type="button">오늘</button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="다음 달">→</button>
+      </div>
+    </div>
+
+    <div class="cal" id="cal"></div>
+
+    <div class="legend">
+      <span><i class="l-out"></i>야외</span>
+      <span><i class="l-in"></i>실내</span>
+      <span><i class="l-today"></i>오늘</span>
+    </div>
+
+    <h2 class="section-title" id="statTitle">Monthly</h2>
+    <div class="stats" id="stats"></div>
+
+    <h2 class="section-title">Shoes</h2>
+    <div id="shoeStats"></div>
+
+    <h2 class="section-title">Manage</h2>
+    <div class="manage">
+      <div class="panel" data-kind="types">
+        <h3>훈련 종류</h3>
+        <ul class="items"></ul>
+        <div class="addrow">
+          <input type="text" maxlength="20" placeholder="새 훈련 종류" aria-label="새 훈련 종류 이름">
+          <button class="btn small" type="button" data-act="add">추가</button>
+        </div>
+        <button class="btn ghost small" type="button" data-act="del" disabled>선택 삭제</button>
+      </div>
+      <div class="panel" data-kind="places">
+        <h3>러닝 장소</h3>
+        <ul class="items"></ul>
+        <div class="addrow">
+          <input type="text" maxlength="30" placeholder="새 러닝 장소" aria-label="새 러닝 장소 이름">
+          <button class="btn small" type="button" data-act="add">추가</button>
+        </div>
+        <button class="btn ghost small" type="button" data-act="del" disabled>선택 삭제</button>
+      </div>
+      <div class="panel" data-kind="shoes">
+        <h3>신발</h3>
+        <ul class="items"></ul>
+        <div class="addrow">
+          <input type="text" maxlength="20" placeholder="새 신발 이름" aria-label="새 신발 이름">
+          <button class="btn small" type="button" data-act="add">추가</button>
+        </div>
+        <button class="btn ghost small" type="button" data-act="del" disabled>선택 삭제</button>
+      </div>
+    </div>
+
+    <p class="note">
+      기록은 이 기기의 브라우저에만 저장돼요. 브라우저의 사이트 데이터를 지우면 기록도 함께 사라져요.<br>
+      목록에서 훈련 종류, 러닝 장소, 신발을 삭제해도 이미 입력한 기록은 그대로 남아요.
+    </p>
+    <p id="warn" hidden>이 브라우저에서는 기록을 저장할 수 없어요. (시크릿 모드이거나 저장이 차단되어 있을 수 있어요)</p>
+  </div>
+
+  <!-- 기록 입력 창 -->
+  <div class="overlay" id="overlay" hidden>
+    <form class="modal" id="form" role="dialog" aria-modal="true" aria-labelledby="mTitle" novalidate>
+      <div class="mhead">
+        <h2 id="mTitle"></h2>
+        <button type="button" class="x" id="closeBtn" aria-label="닫기">✕</button>
+      </div>
+
+      <fieldset class="field">
+        <legend>훈련 장소</legend>
+        <div class="seg">
+          <label><input type="radio" name="place" value="outdoor" checked><span class="o">야외</span></label>
+          <label><input type="radio" name="place" value="indoor"><span class="i">실내</span></label>
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span class="lbl">러닝 장소</span>
+        <select id="fLoc"></select>
+      </label>
+
+      <label class="field" id="fLocOtherWrap" hidden>
+        <span class="lbl">장소 직접 입력</span>
+        <input type="text" id="fLocOther" maxlength="30" placeholder="장소 이름" autocomplete="off">
+      </label>
+
+      <label class="field">
+        <span class="lbl">훈련 종류</span>
+        <select id="fType"></select>
+      </label>
+
+      <div class="row2">
+        <label class="field">
+          <span class="lbl">거리 (km)</span>
+          <input type="number" id="fDist" step="0.01" min="0" inputmode="decimal" placeholder="10.5">
+        </label>
+        <label class="field">
+          <span class="lbl">페이스 (분:초 /km)</span>
+          <input type="text" id="fPace" maxlength="5" placeholder="5:30" autocomplete="off">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="lbl">러닝 시간 (시:분:초 또는 분:초)</span>
+        <input type="text" id="fTime" maxlength="8" placeholder="1:05:30" autocomplete="off">
+      </label>
+
+      <label class="field">
+        <span class="lbl">신발</span>
+        <select id="fShoe"></select>
+      </label>
+
+      <p class="err" id="err" role="alert"></p>
+
+      <div class="actions">
+        <button class="btn" type="submit">저장</button>
+        <button class="btn ghost" type="button" id="delBtn">삭제</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const KEY = 'runlog.v1';
+    const DEFAULTS = {
+      types: ['조깅', '인터벌', '빌드업', '지속주', 'LSD'],
+      shoes: ['뉴발 엘리트', 'Evo SL', '젤카야노', '월드런(젤)', '월드런(카본)'],
+      places: ['반월 체육센터', '화성-수원도로', '광교호수공원', '여울공원', '오산천']
+    };
+    const OTHER = '__other__';
+    const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const pad = n => String(n).padStart(2, '0');
+    const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const fmtKm = n => String(Math.round(n * 100) / 100);
+    const fmtPace = s => `${Math.floor(s / 60)}'${pad(s % 60)}"`;
+    const fmtPaceInput = s => `${Math.floor(s / 60)}:${pad(s % 60)}`;
+    const fmtTime = s => {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+    };
+    // "1:05:30" 또는 "55:30" 형식을 초 단위로 변환 (잘못된 형식이면 NaN)
+    const parseTime = str => {
+      const parts = str.split(':');
+      if (parts.length < 2 || parts.length > 3 || parts.some(p => !/^\d{1,3}$/.test(p))) return NaN;
+      const n = parts.map(Number);
+      let h = 0, m, s;
+      if (n.length === 3) { [h, m, s] = n; } else { [m, s] = n; }
+      if (s > 59) return NaN;
+      if (n.length === 3 && m > 59) return NaN;
+      const total = h * 3600 + m * 60 + s;
+      return total > 0 ? total : NaN;
+    };
+    const esc = s => String(s).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+
+    /* ---------- 저장 / 불러오기 ---------- */
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (raw) {
+          const d = JSON.parse(raw);
+          return {
+            types: Array.isArray(d.types) ? d.types : DEFAULTS.types.slice(),
+            shoes: Array.isArray(d.shoes) ? d.shoes : DEFAULTS.shoes.slice(),
+            places: Array.isArray(d.places) ? d.places : DEFAULTS.places.slice(),
+            records: (d.records && typeof d.records === 'object') ? d.records : {}
+          };
+        }
+      } catch (e) { /* 무시하고 기본값 사용 */ }
+      return { types: DEFAULTS.types.slice(), shoes: DEFAULTS.shoes.slice(), places: DEFAULTS.places.slice(), records: {} };
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(data));
+      } catch (e) {
+        $('#warn').hidden = false;
+      }
+    }
+
+    let data = load();
+    const now = new Date();
+    let view = { y: now.getFullYear(), m: now.getMonth() };
+    let editingKey = null;
+
+    /* ---------- 캘린더 ---------- */
+    function renderCalendar() {
+      const cal = $('#cal');
+      cal.innerHTML = '';
+      $('#monthTitle').textContent = `${view.y}년 ${view.m + 1}월`;
+
+      DOW.forEach(n => {
+        const h = document.createElement('div');
+        h.className = 'dow';
+        h.textContent = n;
+        cal.appendChild(h);
+      });
+
+      const startDow = new Date(view.y, view.m, 1).getDay();
+      const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
+      const total = Math.ceil((startDow + daysInMonth) / 7) * 7;
+      const todayKey = ymd(new Date());
+
+      for (let i = 0; i < total; i++) {
+        const d = new Date(view.y, view.m, 1 - startDow + i);
+        const inMonth = d.getMonth() === view.m;
+        const key = ymd(d);
+        const cell = document.createElement(inMonth ? 'button' : 'div');
+        cell.className = 'cell';
+
+        if (!inMonth) {
+          cell.classList.add('out');
+          cell.innerHTML = `<span class="num">${d.getDate()}</span>`;
+          cal.appendChild(cell);
+          continue;
+        }
+
+        cell.type = 'button';
+        cell.dataset.key = key;
+        if (key === todayKey) cell.classList.add('today');
+
+        const rec = data.records[key];
+        let html = `<span class="num">${d.getDate()}</span>`;
+        let label = `${view.m + 1}월 ${d.getDate()}일`;
+        if (rec) {
+          cell.classList.add('rec', rec.place === 'indoor' ? 'indoor' : 'outdoor');
+          html += `<span class="dist">${fmtKm(rec.dist)}<small>km</small></span>`;
+          if (rec.pace) html += `<span class="meta">${fmtPace(rec.pace)}</span>`;
+          if (rec.time) html += `<span class="meta time">${fmtTime(rec.time)}</span>`;
+          if (rec.type) html += `<span class="meta type">${esc(rec.type)}</span>`;
+          if (rec.loc) html += `<span class="meta loc">${esc(rec.loc)}</span>`;
+          label += `, ${fmtKm(rec.dist)}킬로미터 기록 있음`;
+        } else {
+          label += ', 기록 추가';
+        }
+        cell.setAttribute('aria-label', label);
+        cell.innerHTML = html;
+        cal.appendChild(cell);
+      }
+    }
+
+    /* ---------- 통계 ---------- */
+    function renderStats() {
+      const pre = `${view.y}-${pad(view.m + 1)}-`;
+      const entries = Object.entries(data.records);
+
+      // 월간 합계
+      let dist = 0, count = 0, paceDist = 0, paceWeighted = 0;
+      entries.forEach(([k, r]) => {
+        if (!k.startsWith(pre)) return;
+        dist += r.dist;
+        count++;
+        if (r.pace) { paceDist += r.dist; paceWeighted += r.pace * r.dist; }
+      });
+      const avgPace = paceDist > 0 ? fmtPace(Math.round(paceWeighted / paceDist)) : '-';
+
+      $('#statTitle').textContent = `${view.m + 1}월 누적`;
+      $('#stats').innerHTML = `
+        <div class="stat"><span class="lbl">${view.m + 1}월 누적 거리</span><span class="big">${fmtKm(dist)}<small>km</small></span></div>
+        <div class="stat"><span class="lbl">러닝 횟수</span><span class="mid">${count}<small>회</small></span></div>
+        <div class="stat"><span class="lbl">평균 페이스</span><span class="mid">${avgPace}<small>${avgPace === '-' ? '' : '/km'}</small></span></div>
+      `;
+
+      // 신발별 통계
+      const names = data.shoes.slice();
+      entries.forEach(([, r]) => { if (r.shoe && !names.includes(r.shoe)) names.push(r.shoe); });
+
+      const box = $('#shoeStats');
+      if (names.length === 0) {
+        box.innerHTML = '<p class="empty">등록된 신발이 없어요. 아래에서 신발을 추가해 보세요.</p>';
+        return;
+      }
+
+      const agg = {};
+      names.forEach(n => { agg[n] = { mc: 0, md: 0, tc: 0, td: 0 }; });
+      entries.forEach(([k, r]) => {
+        if (!r.shoe) return;
+        const a = agg[r.shoe];
+        a.tc++; a.td += r.dist;
+        if (k.startsWith(pre)) { a.mc++; a.md += r.dist; }
+      });
+
+      const mLabel = `${view.m + 1}월`;
+      let rows = '';
+      names.forEach(n => {
+        const a = agg[n];
+        const gone = data.shoes.includes(n) ? '' : '<span class="gone">목록에서 삭제됨</span>';
+        rows += `<tr class="${a.tc === 0 ? 'zero' : ''}">
+          <td>${esc(n)}${gone}</td>
+          <td>${a.mc}회</td><td>${fmtKm(a.md)} km</td>
+          <td>${a.tc}회</td><td>${fmtKm(a.td)} km</td>
+        </tr>`;
+      });
+      box.innerHTML = `<table>
+        <thead><tr>
+          <th>신발</th><th>${mLabel} 횟수</th><th>${mLabel} 거리</th><th>전체 횟수</th><th>전체 거리</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    function renderAll() {
+      renderCalendar();
+      renderStats();
+    }
+
+    /* ---------- 월 이동 ---------- */
+    $('#prevBtn').addEventListener('click', () => {
+      view.m--;
+      if (view.m < 0) { view.m = 11; view.y--; }
+      renderAll();
+    });
+    $('#nextBtn').addEventListener('click', () => {
+      view.m++;
+      if (view.m > 11) { view.m = 0; view.y++; }
+      renderAll();
+    });
+    $('#todayBtn').addEventListener('click', () => {
+      const t = new Date();
+      view = { y: t.getFullYear(), m: t.getMonth() };
+      renderAll();
+    });
+
+    /* ---------- 기록 입력 창 ---------- */
+    const overlay = $('#overlay');
+    const form = $('#form');
+    const fType = $('#fType');
+    const fShoe = $('#fShoe');
+    const fLoc = $('#fLoc');
+    const fLocOther = $('#fLocOther');
+    const fLocWrap = $('#fLocOtherWrap');
+    const fDist = $('#fDist');
+    const fPace = $('#fPace');
+    const fTime = $('#fTime');
+    const err = $('#err');
+
+    function fillSelect(sel, list, current) {
+      sel.innerHTML = '';
+      sel.add(new Option('선택 안 함', ''));
+      const items = list.slice();
+      if (current && !items.includes(current)) items.push(current);
+      items.forEach(v => sel.add(new Option(v, v)));
+      sel.value = current || '';
+    }
+
+    function toggleOther() {
+      fLocWrap.hidden = fLoc.value !== OTHER;
+    }
+
+    function fillLoc(current) {
+      fLoc.innerHTML = '';
+      fLoc.add(new Option('선택 안 함', ''));
+      data.places.forEach(v => fLoc.add(new Option(v, v)));
+      fLoc.add(new Option('기타 (직접 입력)', OTHER));
+      if (current && data.places.includes(current)) {
+        fLoc.value = current;
+        fLocOther.value = '';
+      } else if (current) {
+        fLoc.value = OTHER;
+        fLocOther.value = current;
+      } else {
+        fLoc.value = '';
+        fLocOther.value = '';
+      }
+      toggleOther();
+    }
+
+    fLoc.addEventListener('change', () => {
+      toggleOther();
+      if (!fLocWrap.hidden) fLocOther.focus();
+    });
+
+    function openModal(key) {
+      editingKey = key;
+      const rec = data.records[key];
+      const [y, m, d] = key.split('-').map(Number);
+      const dow = DOW[new Date(y, m - 1, d).getDay()];
+      $('#mTitle').textContent = `${y}. ${pad(m)}. ${pad(d)} (${dow})`;
+
+      form.elements.place.value = rec ? rec.place : 'outdoor';
+      fillSelect(fType, data.types, rec ? rec.type : '');
+      fillSelect(fShoe, data.shoes, rec ? rec.shoe : '');
+      fillLoc(rec ? rec.loc : '');
+      fDist.value = rec ? fmtKm(rec.dist) : '';
+      fPace.value = rec && rec.pace ? fmtPaceInput(rec.pace) : '';
+      fTime.value = rec && rec.time ? fmtTime(rec.time) : '';
+      err.textContent = '';
+      $('#delBtn').hidden = !rec;
+
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      fDist.focus();
+    }
+
+    function closeModal() {
+      overlay.hidden = true;
+      document.body.style.overflow = '';
+      editingKey = null;
+    }
+
+    $('#cal').addEventListener('click', e => {
+      const cell = e.target.closest('.cell[data-key]');
+      if (cell) openModal(cell.dataset.key);
+    });
+    $('#closeBtn').addEventListener('click', closeModal);
+    overlay.addEventListener('mousedown', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !overlay.hidden) closeModal();
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const dist = parseFloat(fDist.value);
+      if (!(dist > 0) || dist > 500) {
+        err.textContent = '거리를 0보다 크게 입력해 주세요. (예: 10.5)';
+        fDist.focus();
+        return;
+      }
+
+      let pace = null;
+      const p = fPace.value.trim();
+      if (p) {
+        const mt = p.match(/^(\d{1,2}):([0-5]\d)$/);
+        if (!mt || (Number(mt[1]) * 60 + Number(mt[2])) === 0) {
+          err.textContent = '페이스는 분:초 형식으로 입력해 주세요. (예: 5:30)';
+          fPace.focus();
+          return;
+        }
+        pace = Number(mt[1]) * 60 + Number(mt[2]);
+      }
+
+      let time = null;
+      const t = fTime.value.trim();
+      if (t) {
+        time = parseTime(t);
+        if (isNaN(time)) {
+          err.textContent = '러닝 시간은 시:분:초 또는 분:초 형식으로 입력해 주세요. (예: 1:05:30, 55:30)';
+          fTime.focus();
+          return;
+        }
+      }
+
+      let loc = fLoc.value;
+      if (loc === OTHER) {
+        loc = fLocOther.value.trim();
+        if (!loc) {
+          err.textContent = '기타 장소 이름을 입력해 주세요.';
+          fLocOther.focus();
+          return;
+        }
+      }
+
+      data.records[editingKey] = {
+        place: form.elements.place.value === 'indoor' ? 'indoor' : 'outdoor',
+        loc: loc,
+        type: fType.value,
+        dist: Math.round(dist * 100) / 100,
+        pace: pace,
+        time: time,
+        shoe: fShoe.value
+      };
+      persist();
+      closeModal();
+      renderAll();
+    });
+
+    $('#delBtn').addEventListener('click', () => {
+      if (!editingKey || !data.records[editingKey]) return;
+      if (!confirm('이 날의 기록을 삭제할까요?')) return;
+      delete data.records[editingKey];
+      persist();
+      closeModal();
+      renderAll();
+    });
+
+    /* ---------- 훈련 종류 / 신발 관리 ---------- */
+    function renderItems(panel) {
+      const kind = panel.dataset.kind;
+      const ul = $('.items', panel);
+      ul.innerHTML = '';
+      if (data[kind].length === 0) {
+        ul.innerHTML = '<li><p class="empty">목록이 비어 있어요.</p></li>';
+      }
+      data[kind].forEach(name => {
+        const li = document.createElement('li');
+        const label = document.createElement('label');
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'chk';
+        chk.value = name;
+        const text = document.createElement('span');
+        text.textContent = name;
+        label.append(chk, text);
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+      updateDelButton(panel);
+    }
+
+    function updateDelButton(panel) {
+      const any = panel.querySelector('.chk:checked') !== null;
+      $('[data-act="del"]', panel).disabled = !any;
+    }
+
+    function addItem(panel) {
+      const kind = panel.dataset.kind;
+      const input = $('input[type="text"]', panel);
+      const name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      if (data[kind].includes(name)) {
+        alert('이미 있는 이름이에요.');
+        input.focus();
+        return;
+      }
+      data[kind].push(name);
+      input.value = '';
+      persist();
+      renderItems(panel);
+      renderStats();
+      input.focus();
+    }
+
+    function deleteItems(panel) {
+      const kind = panel.dataset.kind;
+      const picked = Array.from(panel.querySelectorAll('.chk:checked')).map(c => c.value);
+      if (picked.length === 0) return;
+      if (!confirm(`선택한 ${picked.length}개를 목록에서 삭제할까요?\n이미 입력한 기록은 그대로 남아요.`)) return;
+      data[kind] = data[kind].filter(n => !picked.includes(n));
+      persist();
+      renderItems(panel);
+      renderStats();
+    }
+
+    document.querySelectorAll('.panel').forEach(panel => {
+      renderItems(panel);
+      panel.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        if (btn.dataset.act === 'add') addItem(panel);
+        if (btn.dataset.act === 'del') deleteItems(panel);
+      });
+      panel.addEventListener('change', e => {
+        if (e.target.classList.contains('chk')) updateDelButton(panel);
+      });
+      $('input[type="text"]', panel).addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); addItem(panel); }
+      });
+    });
+
+    // 탭으로 돌아왔을 때(날짜가 바뀌었을 수 있음) 오늘 표시를 갱신
+    window.addEventListener('focus', () => { if (overlay.hidden) renderCalendar(); });
+
+    renderAll();
+  })();
+  </script>
+</body>
+</html>
