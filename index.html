@@ -43,6 +43,12 @@
     }
     .brand { font-size: 34px; letter-spacing: .12em; text-transform: uppercase; font-weight: 300; line-height: 1.2; }
     .sub { color: var(--mute); font-size: 12px; letter-spacing: .04em; }
+    .topr { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .sync { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; letter-spacing: .04em; color: var(--mute); }
+    .sync::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #555; }
+    .sync.on::before { background: var(--neon); }
+    .sync.err { color: #ff6b6b; }
+    .sync.err::before { background: #ff6b6b; }
 
     /* ---------- 버튼 ---------- */
     .btn {
@@ -292,7 +298,6 @@
     .actions .btn:first-child { flex: 1; }
 
     .note { color: var(--mute); font-size: 12px; margin-top: 56px; line-height: 1.8; }
-    #warn { color: #ff6b6b; font-size: 12px; margin-top: 8px; }
 
     /* ---------- 모바일 ---------- */
     @media (max-width: 640px) {
@@ -320,7 +325,10 @@
   <div class="wrap">
     <header class="top">
       <div class="brand">Running Log</div>
-      <div class="sub">직장인 러너를 위한 캘린더 기록</div>
+      <div class="topr">
+        <div class="sub">직장인 러너를 위한 캘린더 기록</div>
+        <div class="sync" id="sync" role="status"></div>
+      </div>
     </header>
 
     <div class="monthbar">
@@ -378,10 +386,9 @@
     </div>
 
     <p class="note">
-      기록은 이 기기의 브라우저에만 저장돼요. 브라우저의 사이트 데이터를 지우면 기록도 함께 사라져요.<br>
+      기록은 클라우드(Firebase)에 저장되고, 같은 앱을 연 폰과 PC에 실시간으로 반영돼요.<br>
       목록에서 훈련 종류, 러닝 장소, 신발을 삭제해도 이미 입력한 기록은 그대로 남아요.
     </p>
-    <p id="warn" hidden>이 브라우저에서는 기록을 저장할 수 없어요. (시크릿 모드이거나 저장이 차단되어 있을 수 있어요)</p>
   </div>
 
   <!-- 기록 입력 창 -->
@@ -486,32 +493,13 @@
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
     ));
 
-    /* ---------- 저장 / 불러오기 ---------- */
-    function load() {
-      try {
-        const raw = localStorage.getItem(KEY);
-        if (raw) {
-          const d = JSON.parse(raw);
-          return {
-            types: Array.isArray(d.types) ? d.types : DEFAULTS.types.slice(),
-            shoes: Array.isArray(d.shoes) ? d.shoes : DEFAULTS.shoes.slice(),
-            places: Array.isArray(d.places) ? d.places : DEFAULTS.places.slice(),
-            records: (d.records && typeof d.records === 'object') ? d.records : {}
-          };
-        }
-      } catch (e) { /* 무시하고 기본값 사용 */ }
-      return { types: DEFAULTS.types.slice(), shoes: DEFAULTS.shoes.slice(), places: DEFAULTS.places.slice(), records: {} };
-    }
-
-    function persist() {
-      try {
-        localStorage.setItem(KEY, JSON.stringify(data));
-      } catch (e) {
-        $('#warn').hidden = false;
-      }
-    }
-
-    let data = load();
+    /* ---------- 데이터 (원본은 클라우드, 화면은 실시간으로 받아옴) ---------- */
+    let data = {
+      types: DEFAULTS.types.slice(),
+      shoes: DEFAULTS.shoes.slice(),
+      places: DEFAULTS.places.slice(),
+      records: {}
+    };
     const now = new Date();
     let view = { y: now.getFullYear(), m: now.getMonth() };
     let editingKey = null;
@@ -743,6 +731,7 @@
 
     form.addEventListener('submit', e => {
       e.preventDefault();
+      if (!cloud) { err.textContent = NO_CLOUD; return; }
       const dist = parseFloat(fDist.value);
       if (!(dist > 0) || dist > 500) {
         err.textContent = '거리를 0보다 크게 입력해 주세요. (예: 10.5)';
@@ -792,16 +781,18 @@
         time: time,
         shoe: fShoe.value
       };
-      persist();
+      cloudSaveRecord(editingKey);
       closeModal();
       renderAll();
     });
 
     $('#delBtn').addEventListener('click', () => {
       if (!editingKey || !data.records[editingKey]) return;
+      if (!cloud) { err.textContent = NO_CLOUD; return; }
       if (!confirm('이 날의 기록을 삭제할까요?')) return;
-      delete data.records[editingKey];
-      persist();
+      const delKey = editingKey;
+      delete data.records[delKey];
+      cloudDeleteRecord(delKey);
       closeModal();
       renderAll();
     });
@@ -836,6 +827,7 @@
     }
 
     function addItem(panel) {
+      if (!cloud) { alert(NO_CLOUD); return; }
       const kind = panel.dataset.kind;
       const input = $('input[type="text"]', panel);
       const name = input.value.trim();
@@ -847,7 +839,7 @@
       }
       data[kind].push(name);
       input.value = '';
-      persist();
+      cloudSaveLists();
       renderItems(panel);
       renderStats();
       input.focus();
@@ -857,9 +849,10 @@
       const kind = panel.dataset.kind;
       const picked = Array.from(panel.querySelectorAll('.chk:checked')).map(c => c.value);
       if (picked.length === 0) return;
+      if (!cloud) { alert(NO_CLOUD); return; }
       if (!confirm(`선택한 ${picked.length}개를 목록에서 삭제할까요?\n이미 입력한 기록은 그대로 남아요.`)) return;
       data[kind] = data[kind].filter(n => !picked.includes(n));
-      persist();
+      cloudSaveLists();
       renderItems(panel);
       renderStats();
     }
@@ -883,7 +876,146 @@
     // 탭으로 돌아왔을 때(날짜가 바뀌었을 수 있음) 오늘 표시를 갱신
     window.addEventListener('focus', () => { if (overlay.hidden) renderCalendar(); });
 
+    /* ---------- 클라우드 저장 (Firebase Firestore, 실시간) ---------- */
+    // 웹용 Firebase 설정값은 공개되어도 되는 값이에요. 실제 접근 제한은 Firebase 보안 규칙이 담당해요.
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQINdLuDTKib7iOM6FSN5CKmwq9n0CRDQ",
+      authDomain: "running-log-d723a.firebaseapp.com",
+      projectId: "running-log-d723a",
+      storageBucket: "running-log-d723a.firebasestorage.app",
+      messagingSenderId: "562064958875",
+      appId: "1:562064958875:web:eaab599fdfc4bc824aed3e"
+    };
+    const FB_URL = 'https://www.gstatic.com/firebasejs/10.14.1/';
+    const MIGRATED_FLAG = 'runlog.migrated';   // 예전(이 기기에만 저장하던 버전) 기록을 옮겼는지
+    const NO_CLOUD = '클라우드에 연결되지 않아 저장할 수 없어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
+    let cloud = null;            // 연결되면 { fs, ref }
+    let lastApplied = '';        // 마지막으로 화면에 반영한 클라우드 내용
+    let gotServerData = false;   // 서버에서 최신 내용을 한 번이라도 받았는지
+
+    function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 무시 */ } }
+
+    function setSync(state) {
+      const el = $('#sync');
+      const texts = {
+        connecting: '클라우드 연결 중…',
+        online: '클라우드 동기화됨',
+        syncing: '저장 중…',
+        offline: '오프라인 · 연결되면 자동으로 저장돼요',
+        denied: '클라우드 접근 거부됨 · Firebase 보안 규칙을 확인해 주세요'
+      };
+      el.textContent = texts[state] || '';
+      el.className = 'sync' + (state === 'online' ? ' on' : '') + (state === 'denied' ? ' err' : '');
+    }
+
+    // 키 순서와 상관없이 같은 내용이면 같은 문자열이 되도록 (불필요한 화면 갱신 방지)
+    function stable(v) {
+      return JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x))
+        ? Object.keys(x).sort().reduce((o, key) => { o[key] = x[key]; return o; }, {})
+        : x);
+    }
+
+    function cloudWrite(op) {
+      return op(cloud.fs, cloud.ref).catch(err => {
+        const denied = !!err && err.code === 'permission-denied';
+        setSync(denied ? 'denied' : 'offline');
+        if (denied) alert('클라우드에 저장하지 못했어요. Firebase 보안 규칙을 확인해 주세요.');
+      });
+    }
+
+    // 화면을 먼저 바꾸고(빠른 반응), 클라우드에 저장. 저장이 거부되면 실시간 수신이 원래 내용으로 되돌려요.
+    function cloudSaveRecord(key) {
+      const rec = data.records[key];
+      cloudWrite((fs, ref) => fs.setDoc(ref, { records: { [key]: rec } }, { merge: true }));
+    }
+    function cloudDeleteRecord(key) {
+      cloudWrite((fs, ref) => fs.setDoc(ref, { records: { [key]: fs.deleteField() } }, { merge: true }));
+    }
+    function cloudSaveLists() {
+      const lists = { types: data.types, places: data.places, shoes: data.shoes };
+      cloudWrite((fs, ref) => fs.setDoc(ref, lists, { merge: true }));
+    }
+
+    // 클라우드에서 받은 내용을 화면에 반영 (내용이 바뀐 경우에만)
+    function applyCloud(d) {
+      const sig = stable(d);
+      if (sig === lastApplied) return;
+      lastApplied = sig;
+      data.types = Array.isArray(d.types) ? d.types.slice() : DEFAULTS.types.slice();
+      data.shoes = Array.isArray(d.shoes) ? d.shoes.slice() : DEFAULTS.shoes.slice();
+      data.places = Array.isArray(d.places) ? d.places.slice() : DEFAULTS.places.slice();
+      data.records = (d.records && typeof d.records === 'object') ? d.records : {};
+      renderAll();
+      document.querySelectorAll('.panel').forEach(renderItems);
+    }
+
+    // 서버에서 처음 받았을 때 한 번만: 빈 클라우드면 기본 목록을 만들고,
+    // 예전(이 기기에만 저장하던 버전)에 입력한 기록이 있으면 클라우드에 없는 것만 옮겨요.
+    function bootstrap(d) {
+      if (gotServerData) return;
+      gotServerData = true;
+      let old = null;
+      if (lsGet(MIGRATED_FLAG) !== '1' && lsGet('runlog.cloudSynced') !== '1') {
+        try { old = JSON.parse(lsGet(KEY) || 'null'); } catch (e) { old = null; }
+      }
+      const payload = {};
+      if (!d) {
+        ['types', 'places', 'shoes'].forEach(k => {
+          payload[k] = (old && Array.isArray(old[k])) ? old[k] : DEFAULTS[k].slice();
+        });
+      }
+      if (old && old.records && typeof old.records === 'object') {
+        const have = (d && d.records) || {};
+        const add = {};
+        Object.keys(old.records).forEach(k => { if (!(k in have)) add[k] = old.records[k]; });
+        if (Object.keys(add).length) payload.records = add;
+      }
+      if (Object.keys(payload).length === 0) { lsSet(MIGRATED_FLAG, '1'); return; }
+      cloudWrite((fs, ref) => fs.setDoc(ref, payload, { merge: true }).then(() => lsSet(MIGRATED_FLAG, '1')));
+    }
+
+    async function initCloud() {
+      setSync('connecting');
+      try {
+        const [appMod, fs] = await Promise.all([
+          import(FB_URL + 'firebase-app.js'),
+          import(FB_URL + 'firebase-firestore.js')
+        ]);
+        const app = appMod.initializeApp(firebaseConfig);
+        let db;
+        try {
+          // 인터넷이 잠깐 끊겨도 쓸 수 있게 Firebase가 알아서 관리하는 임시 저장 기능을 켬
+          db = fs.initializeFirestore(app, {
+            localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() })
+          });
+        } catch (e) {
+          db = fs.getFirestore(app);
+        }
+        const ref = fs.doc(db, 'runlog', 'main');
+        cloud = { fs, ref };
+
+        setTimeout(() => { if (!gotServerData) setSync('offline'); }, 6000);
+
+        // 실시간 수신: 다른 기기에서 바뀌면 바로 이 화면에도 반영돼요
+        fs.onSnapshot(ref, { includeMetadataChanges: true }, snap => {
+          const d = snap.exists() ? snap.data() : null;
+          const m = snap.metadata;
+          if (!m.fromCache) bootstrap(d);
+          if (d) applyCloud(d);
+          if (m.fromCache) setSync(gotServerData ? 'offline' : 'connecting');
+          else if (m.hasPendingWrites) setSync('syncing');
+          else setSync('online');
+        }, err => {
+          setSync(err && err.code === 'permission-denied' ? 'denied' : 'offline');
+        });
+      } catch (e) {
+        setSync('offline');
+      }
+    }
+
     renderAll();
+    initCloud();
   })();
   </script>
 </body>
