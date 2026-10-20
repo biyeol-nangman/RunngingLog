@@ -230,7 +230,7 @@
     .chk:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
     /* ---------- 입력 요소 ---------- */
-    input[type="text"], input[type="number"], select {
+    input[type="text"], input[type="number"], select, textarea {
       background: #000;
       color: #fff;
       border: 0;
@@ -240,8 +240,9 @@
       border-radius: 0;
       width: 100%;
     }
-    input:focus, select:focus { outline: 0; border-bottom-color: #fff; }
-    input::placeholder { color: #5f5f5f; }
+    textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+    input:focus, select:focus, textarea:focus { outline: 0; border-bottom-color: #fff; }
+    input::placeholder, textarea::placeholder { color: #5f5f5f; }
 
     /* ---------- 모달 ---------- */
     .overlay {
@@ -310,7 +311,7 @@
       .dist { font-size: 13px; }
       .dist small { display: none; }
       .meta { font-size: 9px; }
-      .meta.type, .meta.loc, .meta.time { display: none; }
+      .meta.type, .meta.loc, .meta.time, .meta.note { display: none; }
       .dow { padding: 8px 4px; }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat:first-child { grid-column: 1 / -1; }
@@ -443,6 +444,11 @@
         <select id="fShoe"></select>
       </label>
 
+      <label class="field">
+        <span class="lbl">비고 (특이사항)</span>
+        <textarea id="fNote" rows="3" maxlength="200" placeholder="컨디션, 날씨, 통증 등 특이사항을 적어 보세요"></textarea>
+      </label>
+
       <p class="err" id="err" role="alert"></p>
 
       <div class="actions">
@@ -550,6 +556,11 @@
           if (rec.time) html += `<span class="meta time">${fmtTime(rec.time)}</span>`;
           if (rec.type) html += `<span class="meta type">${esc(rec.type)}</span>`;
           if (rec.loc) html += `<span class="meta loc">${esc(rec.loc)}</span>`;
+          if (rec.note) {
+            html += `<span class="meta note">※ ${esc(rec.note)}</span>`;
+            cell.title = rec.note;
+            label += `, 비고: ${rec.note}`;
+          }
           label += `, ${fmtKm(rec.dist)}킬로미터 기록 있음`;
         } else {
           label += ', 기록 추가';
@@ -653,6 +664,7 @@
     const fDist = $('#fDist');
     const fPace = $('#fPace');
     const fTime = $('#fTime');
+    const fNote = $('#fNote');
     const err = $('#err');
 
     function fillSelect(sel, list, current) {
@@ -705,6 +717,7 @@
       fDist.value = rec ? fmtKm(rec.dist) : '';
       fPace.value = rec && rec.pace ? fmtPaceInput(rec.pace) : '';
       fTime.value = rec && rec.time ? fmtTime(rec.time) : '';
+      fNote.value = rec && rec.note ? rec.note : '';
       err.textContent = '';
       $('#delBtn').hidden = !rec;
 
@@ -779,7 +792,8 @@
         dist: Math.round(dist * 100) / 100,
         pace: pace,
         time: time,
-        shoe: fShoe.value
+        shoe: fShoe.value,
+        note: fNote.value.trim().slice(0, 200)
       };
       cloudSaveRecord(editingKey);
       closeModal();
