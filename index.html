@@ -143,6 +143,8 @@
       text-overflow: ellipsis;
     }
 
+    .meta.memo { color: #8a8a8a; }
+
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -311,7 +313,7 @@
       .dist { font-size: 13px; }
       .dist small { display: none; }
       .meta { font-size: 9px; }
-      .meta.type, .meta.loc, .meta.time, .meta.note { display: none; }
+      .hide-m { display: none; }
       .dow { padding: 8px 4px; }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat:first-child { grid-column: 1 / -1; }
@@ -552,12 +554,16 @@
         if (rec) {
           cell.classList.add('rec', rec.place === 'indoor' ? 'indoor' : 'outdoor');
           html += `<span class="dist">${fmtKm(rec.dist)}<small>km</small></span>`;
-          if (rec.pace) html += `<span class="meta">${fmtPace(rec.pace)}</span>`;
-          if (rec.time) html += `<span class="meta time">${fmtTime(rec.time)}</span>`;
-          if (rec.type) html += `<span class="meta type">${esc(rec.type)}</span>`;
-          if (rec.loc) html += `<span class="meta loc">${esc(rec.loc)}</span>`;
+          // 칸이 커지지 않도록 한 줄에 묶어서 표시: 페이스 · 시간 / 종류 · 장소 / 비고
+          if (rec.pace || rec.time) {
+            html += `<span class="meta">${rec.pace ? fmtPace(rec.pace) : ''}`
+              + (rec.time ? `<span class="hide-m">${rec.pace ? ' · ' : ''}${fmtTime(rec.time)}</span>` : '')
+              + `</span>`;
+          }
+          const typeLoc = [rec.type, rec.loc].filter(Boolean).map(esc).join(' · ');
+          if (typeLoc) html += `<span class="meta hide-m">${typeLoc}</span>`;
           if (rec.note) {
-            html += `<span class="meta note">※ ${esc(rec.note)}</span>`;
+            html += `<span class="meta memo hide-m">※ ${esc(rec.note)}</span>`;
             cell.title = rec.note;
             label += `, 비고: ${rec.note}`;
           }
