@@ -204,6 +204,8 @@
     .items li { border-bottom: 1px solid var(--line); }
     .items label { display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; }
     .addrow { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 14px; }
+    .addrow input { min-width: 0; }
+    .addrow .btn { flex: none; white-space: nowrap; letter-spacing: .08em; }
 
     .chk {
       -webkit-appearance: none;
@@ -302,6 +304,135 @@
 
     .note { color: var(--mute); font-size: 12px; margin-top: 56px; line-height: 1.8; }
 
+    /* ---------- 크루 ---------- */
+    .crewbar { display: flex; align-items: center; gap: 8px; margin-top: 20px; overflow-x: auto; padding-bottom: 4px; }
+    .crewbar .btn { flex: none; }
+    .chip {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid #333;
+      padding: 4px 14px 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      border-radius: 0;
+      font-size: 13px;
+    }
+    .chip:hover { border-color: #777; }
+    .chip.on { border-color: var(--neon); }
+    .chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .chip svg { width: 24px; height: 32px; }
+
+    .av { display: block; overflow: visible; }
+    @keyframes legswing { from { transform: rotate(-38deg); } to { transform: rotate(38deg); } }
+    @keyframes armswing { from { transform: rotate(-55deg); } to { transform: rotate(55deg); } }
+    @keyframes bobup { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+    .av.run .l1 { animation: legswing .42s ease-in-out infinite alternate; }
+    .av.run .l2 { animation: legswing .42s ease-in-out infinite alternate-reverse; }
+    .av.run .a1 { animation: armswing .42s ease-in-out infinite alternate-reverse; }
+    .av.run .a2 { animation: armswing .42s ease-in-out infinite alternate; }
+    .av.run .bob { animation: bobup .21s ease-in-out infinite alternate; }
+    @keyframes hairsway { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+    .av.run .hair { animation: hairsway .42s ease-in-out infinite alternate; }
+    .av.cheer .a1 { transform: rotate(155deg); }
+    .av.cheer .a2 { transform: rotate(-155deg); }
+
+    .who { display: inline-flex; align-items: center; gap: 10px; }
+    .who svg { width: 20px; height: 27px; flex: none; }
+    th.l, td.l { text-align: left; }
+    td.rk { width: 56px; font-weight: 300; font-size: 18px; }
+    tr.me .nm { color: var(--neon); }
+    tr.zero2 td { color: #5a5a5a; }
+
+    .race { border: 1px solid var(--line); }
+    .race .empty { padding: 22px; }
+    .lane { display: grid; grid-template-columns: 128px minmax(0, 1fr); height: 62px; border-bottom: 1px solid var(--line); }
+    .lane:last-child { border-bottom: 0; }
+    .ln { padding: 0 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; border-right: 1px solid var(--line); }
+    .ln b { font-weight: 500; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ln span { color: var(--mute); font-size: 12px; }
+    .track { position: relative; margin: 0 30px 0 14px; }
+    .track::after { content: ""; position: absolute; left: 0; right: 0; bottom: 9px; border-bottom: 1px dashed #333; }
+    .track::before {
+      content: "";
+      position: absolute;
+      right: -22px;
+      top: 8px;
+      bottom: 8px;
+      width: 8px;
+      background: repeating-conic-gradient(#fff 0% 25%, #000 0% 50%) 50% / 8px 8px;
+      opacity: .55;
+    }
+    .runner { position: absolute; bottom: 6px; left: 0; width: 34px; height: 45px; transition: left 1.8s cubic-bezier(.22, .8, .25, 1); }
+    .runner svg { width: 100%; height: 100%; }
+
+    .pmsg { color: var(--mute); font-size: 12px; margin: -4px 0 14px; }
+    .podium {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 32px 12px 0;
+      min-height: 340px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .pstep { display: flex; flex-direction: column; align-items: center; width: min(190px, 31%); position: relative; z-index: 1; }
+    .pstep .av { width: 76px; height: 101px; }
+    .pstep.p1 .av { width: 92px; height: 123px; }
+    .ptag { font-size: 10px; letter-spacing: .24em; color: var(--neon); margin-bottom: 6px; }
+    .pname { margin-top: 8px; font-size: 14px; font-weight: 500; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pkm { color: var(--mute); font-size: 12px; margin-bottom: 10px; }
+    .block {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
+      font-size: 40px;
+      font-weight: 200;
+      background: linear-gradient(#1a1a1a, #0a0a0a);
+      border: 1px solid #2a2a2a;
+      border-bottom: 0;
+    }
+    .p1 .block { height: 132px; border-top: 2px solid var(--neon); }
+    .p2 .block { height: 98px; }
+    .p3 .block { height: 74px; }
+    .pstep.empty .block { color: #3a3a3a; }
+    .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .cf { position: absolute; top: -14px; width: 6px; height: 10px; opacity: .9; animation: cffall linear infinite; }
+    @keyframes cffall { to { transform: translateY(380px) rotate(540deg); opacity: 0; } }
+
+    .mwho { color: var(--neon); font-size: 12px; letter-spacing: .06em; margin: -12px 0 20px; }
+    .mprev { display: flex; justify-content: center; margin-bottom: 18px; }
+    .mprev svg { width: 72px; height: 96px; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+    .sw { position: relative; width: 30px; height: 30px; }
+    .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .sw span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 2px solid transparent; }
+    .sw input:checked + span { border-color: #fff; box-shadow: inset 0 0 0 2px #000; }
+    .sw.taken span { opacity: .22; }
+    .sw.taken input { cursor: not-allowed; }
+    .sw.taken::after { content: "\00d7"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; pointer-events: none; }
+    .sw input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+    .opts { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #444; }
+    .opts label { position: relative; cursor: pointer; }
+    .opts input { position: absolute; inset: 0; opacity: 0; }
+    .opts span { display: block; padding: 10px 4px; text-align: center; font-size: 13px; }
+    .opts input:checked + span { background: #fff; color: #000; font-weight: 600; }
+    .opts input:focus-visible + span { outline: 2px solid #fff; outline-offset: -4px; }
+    .whogrid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .whogrid .chip { padding: 8px 18px 8px 10px; }
+    .whogrid .chip svg { width: 30px; height: 40px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .av.run * { animation: none !important; }
+      .runner { transition: none !important; }
+      .confetti { display: none; }
+    }
+
     /* ---------- 모바일 ---------- */
     @media (max-width: 640px) {
       .wrap { padding: 20px 12px 56px; }
@@ -321,6 +452,15 @@
       .manage { grid-template-columns: 1fr; }
       th, td { font-size: 12px; }
       .modal { padding: 22px; }
+      .lane { grid-template-columns: 84px minmax(0, 1fr); height: 56px; }
+      .ln { padding: 0 8px; }
+      .ln b { font-size: 12px; }
+      .track { margin: 0 24px 0 8px; }
+      .podium { padding: 24px 6px 0; gap: 6px; min-height: 300px; }
+      .pstep .av { width: 54px; height: 72px; }
+      .pstep.p1 .av { width: 66px; height: 88px; }
+      .block { font-size: 30px; }
+      td.rk { width: 40px; font-size: 15px; }
     }
   </style>
 </head>
@@ -329,10 +469,12 @@
     <header class="top">
       <div class="brand">Running Log</div>
       <div class="topr">
-        <div class="sub">직장인 러너를 위한 캘린더 기록</div>
+        <div class="sub">러닝 크루를 위한 캘린더 기록</div>
         <div class="sync" id="sync" role="status"></div>
       </div>
     </header>
+
+    <div class="crewbar" id="crewbar" aria-label="크루원 선택"></div>
 
     <div class="monthbar">
       <h1 id="monthTitle"></h1>
@@ -357,10 +499,20 @@
     <h2 class="section-title">Shoes</h2>
     <div id="shoeStats"></div>
 
+    <h2 class="section-title" id="crewTitle">Crew</h2>
+    <div id="standings"></div>
+
+    <h2 class="section-title">Race</h2>
+    <div class="race" id="race"></div>
+
+    <h2 class="section-title" id="podiumTitle">Podium</h2>
+    <p class="pmsg" id="podiumMsg"></p>
+    <div class="podium" id="podium"></div>
+
     <h2 class="section-title">Manage</h2>
     <div class="manage">
       <div class="panel" data-kind="types">
-        <h3>훈련 종류</h3>
+        <h3>훈련 종류 · 크루 공용</h3>
         <ul class="items"></ul>
         <div class="addrow">
           <input type="text" maxlength="20" placeholder="새 훈련 종류" aria-label="새 훈련 종류 이름">
@@ -369,7 +521,7 @@
         <button class="btn ghost small" type="button" data-act="del" disabled>선택 삭제</button>
       </div>
       <div class="panel" data-kind="places">
-        <h3>러닝 장소</h3>
+        <h3>러닝 장소 · 크루 공용</h3>
         <ul class="items"></ul>
         <div class="addrow">
           <input type="text" maxlength="30" placeholder="새 러닝 장소" aria-label="새 러닝 장소 이름">
@@ -378,7 +530,7 @@
         <button class="btn ghost small" type="button" data-act="del" disabled>선택 삭제</button>
       </div>
       <div class="panel" data-kind="shoes">
-        <h3>신발</h3>
+        <h3 id="shoeH3">신발</h3>
         <ul class="items"></ul>
         <div class="addrow">
           <input type="text" maxlength="20" placeholder="새 신발 이름" aria-label="새 신발 이름">
@@ -389,7 +541,9 @@
     </div>
 
     <p class="note">
-      기록은 클라우드(Firebase)에 저장되고, 같은 앱을 연 폰과 PC에 실시간으로 반영돼요.<br>
+      기록은 클라우드(Firebase)에 저장되고, 같은 앱을 연 크루원들의 폰과 PC에 실시간으로 반영돼요.<br>
+      로그인이 없어서 누구나 다른 크루원의 기록도 고칠 수 있어요. 서로 믿고 사용해 주세요.<br>
+      훈련 종류와 러닝 장소는 크루가 함께 쓰고, 신발은 사람마다 따로 관리해요.<br>
       목록에서 훈련 종류, 러닝 장소, 신발을 삭제해도 이미 입력한 기록은 그대로 남아요.
     </p>
   </div>
@@ -401,6 +555,8 @@
         <h2 id="mTitle"></h2>
         <button type="button" class="x" id="closeBtn" aria-label="닫기">✕</button>
       </div>
+
+      <p class="mwho" id="mWho"></p>
 
       <fieldset class="field">
         <legend>훈련 장소</legend>
@@ -460,11 +616,52 @@
     </form>
   </div>
 
+  <!-- 크루원 추가/편집 창 -->
+  <div class="overlay" id="mOverlay" hidden>
+    <form class="modal" id="mForm" role="dialog" aria-modal="true" aria-labelledby="mmTitle" novalidate>
+      <div class="mhead">
+        <h2 id="mmTitle">새 크루원</h2>
+        <button type="button" class="x" id="mmClose" aria-label="닫기">✕</button>
+      </div>
+      <div class="mprev" id="mmPrev"></div>
+      <label class="field">
+        <span class="lbl">이름</span>
+        <input type="text" id="mmName" maxlength="12" placeholder="이름 (12자 이내)" autocomplete="off">
+      </label>
+      <fieldset class="field">
+        <legend>캐릭터 색</legend>
+        <div class="swatches" id="mmColors"></div>
+      </fieldset>
+      <fieldset class="field">
+        <legend>소품 (여러 개 선택 가능)</legend>
+        <div class="opts" id="mmAcc"></div>
+      </fieldset>
+      <p class="err" id="mmErr" role="alert"></p>
+      <div class="actions">
+        <button class="btn" type="submit">저장</button>
+        <button class="btn ghost" type="button" id="mmDel">삭제</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 누구세요? -->
+  <div class="overlay" id="whoOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="whoTitle">
+      <div class="mhead">
+        <h2 id="whoTitle">누구세요?</h2>
+      </div>
+      <div class="whogrid" id="whoGrid"></div>
+      <div class="actions" style="margin-top:22px">
+        <button class="btn ghost" type="button" id="whoAdd">+ 새 크루원</button>
+      </div>
+    </div>
+  </div>
+
   <script>
   (() => {
     'use strict';
 
-    const KEY = 'runlog.v1';
+    const ME_KEY = 'runlog.me';   // 이 기기에서 마지막으로 고른 크루원
     const DEFAULTS = {
       types: ['조깅', '인터벌', '빌드업', '지속주', 'LSD'],
       shoes: ['뉴발 엘리트', 'Evo SL', '젤카야노', '월드런(젤)', '월드런(카본)'],
@@ -502,15 +699,24 @@
     ));
 
     /* ---------- 데이터 (원본은 클라우드, 화면은 실시간으로 받아옴) ---------- */
-    let data = {
-      types: DEFAULTS.types.slice(),
-      shoes: DEFAULTS.shoes.slice(),
-      places: DEFAULTS.places.slice(),
-      records: {}
+    let shared = { types: DEFAULTS.types.slice(), places: DEFAULTS.places.slice() };  // 크루 공용 목록
+    let members = {};                 // 크루원 id -> { id, name, color, accessories, shoes, records, order }
+    let meId = lsGet(ME_KEY);         // 지금 보고(입력하고) 있는 크루원
+    function cur() { return meId && members[meId] ? members[meId] : null; }
+    function sortedMembers() {
+      return Object.values(members).sort((x, y) => (x.order - y.order) || x.name.localeCompare(y.name, 'ko'));
+    }
+    // 기존 코드가 data.records / data.shoes 로 현재 크루원의 내용을 읽을 수 있게 연결
+    const data = {
+      get types() { return shared.types; },
+      get places() { return shared.places; },
+      get shoes() { const m = cur(); return m ? m.shoes : []; },
+      get records() { const m = cur(); return m ? m.records : {}; }
     };
     const now = new Date();
     let view = { y: now.getFullYear(), m: now.getMonth() };
     let editingKey = null;
+    let editingMember = null;
 
     /* ---------- 캘린더 ---------- */
     function renderCalendar() {
@@ -592,7 +798,8 @@
       });
       const avgPace = paceDist > 0 ? fmtPace(Math.round(paceWeighted / paceDist)) : '-';
 
-      $('#statTitle').textContent = `${view.m + 1}월 누적`;
+      const who = cur();
+      $('#statTitle').textContent = `${who ? who.name + ' · ' : ''}${view.m + 1}월 누적`;
       $('#stats').innerHTML = `
         <div class="stat"><span class="lbl">${view.m + 1}월 누적 거리</span><span class="big">${fmtKm(dist)}<small>km</small></span></div>
         <div class="stat"><span class="lbl">러닝 횟수</span><span class="mid">${count}<small>회</small></span></div>
@@ -638,8 +845,17 @@
     }
 
     function renderAll() {
+      renderCrewBar();
       renderCalendar();
       renderStats();
+      renderCrew();
+    }
+
+    // 훈련 종류 / 러닝 장소 / 신발 관리 목록 다시 그리기
+    function renderPanels() {
+      const who = cur();
+      $('#shoeH3').textContent = who ? `신발 · ${who.name}` : '신발';
+      document.querySelectorAll('.panel').forEach(renderItems);
     }
 
     /* ---------- 월 이동 ---------- */
@@ -710,7 +926,13 @@
     });
 
     function openModal(key) {
+      if (!cur()) {
+        if (Object.keys(members).length) openWho(); else openMemberModal(null);
+        return;
+      }
       editingKey = key;
+      editingMember = meId;
+      $('#mWho').textContent = `기록 대상 · ${cur().name}`;
       const rec = data.records[key];
       const [y, m, d] = key.split('-').map(Number);
       const dow = DOW[new Date(y, m - 1, d).getDay()];
@@ -736,6 +958,7 @@
       overlay.hidden = true;
       document.body.style.overflow = '';
       editingKey = null;
+      editingMember = null;
     }
 
     $('#cal').addEventListener('click', e => {
@@ -751,6 +974,8 @@
     form.addEventListener('submit', e => {
       e.preventDefault();
       if (!cloud) { err.textContent = NO_CLOUD; return; }
+      const me = members[editingMember];
+      if (!me) { err.textContent = '크루원 정보를 찾을 수 없어요. 창을 닫고 다시 선택해 주세요.'; return; }
       const dist = parseFloat(fDist.value);
       if (!(dist > 0) || dist > 500) {
         err.textContent = '거리를 0보다 크게 입력해 주세요. (예: 10.5)';
@@ -791,7 +1016,7 @@
         }
       }
 
-      data.records[editingKey] = {
+      me.records[editingKey] = {
         place: form.elements.place.value === 'indoor' ? 'indoor' : 'outdoor',
         loc: loc,
         type: fType.value,
@@ -801,18 +1026,19 @@
         shoe: fShoe.value,
         note: fNote.value.trim().slice(0, 200)
       };
-      cloudSaveRecord(editingKey);
+      cloudSaveRecord(me.id, editingKey);
       closeModal();
       renderAll();
     });
 
     $('#delBtn').addEventListener('click', () => {
-      if (!editingKey || !data.records[editingKey]) return;
+      const me = members[editingMember];
+      if (!editingKey || !me || !me.records[editingKey]) return;
       if (!cloud) { err.textContent = NO_CLOUD; return; }
-      if (!confirm('이 날의 기록을 삭제할까요?')) return;
+      if (!confirm(`${me.name}님의 이 날 기록을 삭제할까요?`)) return;
       const delKey = editingKey;
-      delete data.records[delKey];
-      cloudDeleteRecord(delKey);
+      delete me.records[delKey];
+      cloudDeleteRecord(me.id, delKey);
       closeModal();
       renderAll();
     });
@@ -849,6 +1075,8 @@
     function addItem(panel) {
       if (!cloud) { alert(NO_CLOUD); return; }
       const kind = panel.dataset.kind;
+      const me = cur();
+      if (kind === 'shoes' && !me) { alert('먼저 크루원을 선택해 주세요.'); return; }
       const input = $('input[type="text"]', panel);
       const name = input.value.trim();
       if (!name) { input.focus(); return; }
@@ -859,7 +1087,7 @@
       }
       data[kind].push(name);
       input.value = '';
-      cloudSaveLists();
+      if (kind === 'shoes') cloudSaveShoes(me.id); else cloudSaveLists();
       renderItems(panel);
       renderStats();
       input.focus();
@@ -870,9 +1098,17 @@
       const picked = Array.from(panel.querySelectorAll('.chk:checked')).map(c => c.value);
       if (picked.length === 0) return;
       if (!cloud) { alert(NO_CLOUD); return; }
-      if (!confirm(`선택한 ${picked.length}개를 목록에서 삭제할까요?\n이미 입력한 기록은 그대로 남아요.`)) return;
-      data[kind] = data[kind].filter(n => !picked.includes(n));
-      cloudSaveLists();
+      const me = cur();
+      if (kind === 'shoes' && !me) return;
+      const scope = kind === 'shoes' ? `${me.name}님의 신발 목록에서` : '크루 공용 목록에서';
+      if (!confirm(`선택한 ${picked.length}개를 ${scope} 삭제할까요?\n이미 입력한 기록은 그대로 남아요.`)) return;
+      if (kind === 'shoes') {
+        me.shoes = me.shoes.filter(n => !picked.includes(n));
+        cloudSaveShoes(me.id);
+      } else {
+        shared[kind] = shared[kind].filter(n => !picked.includes(n));
+        cloudSaveLists();
+      }
       renderItems(panel);
       renderStats();
     }
@@ -896,6 +1132,323 @@
     // 탭으로 돌아왔을 때(날짜가 바뀌었을 수 있음) 오늘 표시를 갱신
     window.addEventListener('focus', () => { if (overlay.hidden) renderCalendar(); });
 
+    /* ---------- 캐릭터 ---------- */
+    // 한 사람이 고른 색은 다른 크루원이 고를 수 없어서, 색이 넉넉해야 해요 (12가지)
+    const COLORS = ['#FF4D4D', '#FF9F1C', '#FFD93D', '#8B5E3C', '#F15BB5', '#9B5DE5',
+                    '#4D96FF', '#2EC4B6', '#C9CED6', '#FFFFFF', '#6C7A89', '#FFB5A7'];
+    const ACCS = [['cap', '캡'], ['band', '밴드'], ['shades', '선글라스'], ['longhair', '긴머리']];
+    const ACC_IDS = ACCS.map(a => a[0]);
+    const SKIN = '#F1E0CC';
+    const HAIR = '#2B1D16';
+
+    // 직접 그린 러너 캐릭터 (색과 소품 여러 개를 겹쳐서 사람마다 다르게)
+    function avatar(m, o = {}) {
+      const c = m.color;
+      const acc = m.accessories || [];
+      const has = k => acc.includes(k);
+      let back = '', top = '', gear = '';
+      if (has('longhair')) {
+        back = `<g class="hair" style="transform-origin:17px 10px"><path d="M17 7C6 9 3 22 6 33c1 2.4 4.4 2.6 5.6.4C9.6 25 12 17 19 14Z" fill="${HAIR}"/></g>`;
+        top = `<path d="M15.1 12.5C14.6 6.6 19 3 24 3s9.4 3.6 9 9.5c-1.6-3.4-4.6-5.6-9-5.6s-7.4 2.2-8.9 5.6z" fill="${HAIR}"/>`;
+      }
+      if (has('band')) gear += `<rect x="15.4" y="6.4" width="17.2" height="3.4" rx="1.4" fill="#39FF14"/>`;
+      if (has('cap')) {
+        gear += `<path d="M15 11.5a9 9 0 0 1 18 0z" fill="${c}" stroke="#000" stroke-opacity=".35" stroke-width=".6"/>`
+          + `<rect x="27" y="9.5" width="11" height="3" rx="1.5" fill="${c}" stroke="#000" stroke-opacity=".35" stroke-width=".6"/>`;
+      }
+      if (has('shades')) {
+        gear += `<rect x="21" y="9.6" width="14" height="4.2" rx="1.6" fill="#111"/>`
+          + `<path d="M23 11h3" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/>`;
+      }
+      const eye = has('shades') ? '' : `<circle cx="28" cy="12" r="1.3" fill="#111"/>`;
+      const cls = 'av' + (o.run ? ' run' : '') + (o.cheer ? ' cheer' : '');
+      const limb = (x, y1, y2, w) => `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${SKIN}" stroke-width="${w}" stroke-linecap="round"/>`;
+      return `<svg class="${cls}" viewBox="0 0 48 64" aria-hidden="true" focusable="false"><g class="bob">`
+        + `<g class="lg l2" style="transform-origin:28px 42px">${limb(28, 42, 57, 5)}<ellipse cx="30" cy="59.5" rx="5.2" ry="2.6" fill="#39FF14"/></g>`
+        + `<g class="lg l1" style="transform-origin:20px 42px">${limb(20, 42, 57, 5)}<ellipse cx="22" cy="59.5" rx="5.2" ry="2.6" fill="#39FF14"/></g>`
+        + `<g class="arm a2" style="transform-origin:31px 26px">${limb(31, 26, 39, 4.2)}</g>`
+        + `<rect x="15" y="39" width="18" height="8" rx="3" fill="#202020"/>`
+        + `<rect x="15" y="21" width="18" height="21" rx="6" fill="${c}"/>`
+        + `<g class="arm a1" style="transform-origin:17px 26px">${limb(17, 26, 39, 4.2)}</g>`
+        + back
+        + `<circle cx="24" cy="12" r="9" fill="${SKIN}"/>${top}${eye}${gear}`
+        + `</g></svg>`;
+    }
+
+    /* ---------- 크루 선택 바 ---------- */
+    function setMe(id) {
+      meId = id;
+      lsSet(ME_KEY, id);
+    }
+
+    function renderCrewBar() {
+      let html = sortedMembers().map(m =>
+        `<button type="button" class="chip${m.id === meId ? ' on' : ''}" data-id="${esc(m.id)}" aria-pressed="${m.id === meId}">${avatar(m)}<span>${esc(m.name)}</span></button>`
+      ).join('');
+      html += `<button type="button" class="btn ghost small" id="addMemberBtn">+ 크루원</button>`;
+      if (cur()) html += `<button type="button" class="btn ghost small" id="editMemberBtn">편집</button>`;
+      $('#crewbar').innerHTML = html;
+    }
+
+    $('#crewbar').addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (chip) {
+        setMe(chip.dataset.id);
+        renderAll();
+        renderPanels();
+        return;
+      }
+      if (e.target.closest('#addMemberBtn')) openMemberModal(null);
+      if (e.target.closest('#editMemberBtn') && cur()) openMemberModal(meId);
+    });
+
+    /* ---------- 누구세요? ---------- */
+    const whoOverlay = $('#whoOverlay');
+    function openWho() {
+      $('#whoGrid').innerHTML = sortedMembers().map(m =>
+        `<button type="button" class="chip" data-id="${esc(m.id)}">${avatar(m)}<span>${esc(m.name)}</span></button>`
+      ).join('');
+      whoOverlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeWho() {
+      whoOverlay.hidden = true;
+      document.body.style.overflow = '';
+    }
+    $('#whoGrid').addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      setMe(chip.dataset.id);
+      closeWho();
+      renderAll();
+      renderPanels();
+    });
+    $('#whoAdd').addEventListener('click', () => { closeWho(); openMemberModal(null); });
+
+    /* ---------- 크루원 추가 / 편집 ---------- */
+    const mOverlay = $('#mOverlay');
+    const mForm = $('#mForm');
+    const mmName = $('#mmName');
+    const mmErr = $('#mmErr');
+    let editingMemberId = null;
+
+    function mmPick() {
+      const c = mForm.querySelector('input[name="mmColor"]:checked');
+      const acc = Array.from(mForm.querySelectorAll('input[name="mmAcc"]:checked')).map(i => i.value);
+      return { color: c ? c.value : COLORS[0], accessories: acc };
+    }
+    function mmPreview() {
+      $('#mmPrev').innerHTML = avatar(Object.assign({ name: '' }, mmPick()));
+    }
+
+    // 다른 크루원이 이미 쓰는 색 -> { '#FF4D4D': '민수', ... }
+    function takenColors(exceptId) {
+      const t = {};
+      Object.values(members).forEach(x => { if (x.id !== exceptId) t[x.color.toUpperCase()] = x.name; });
+      return t;
+    }
+
+    function openMemberModal(id) {
+      editingMemberId = id;
+      const m = id ? members[id] : null;
+      $('#mmTitle').textContent = m ? '크루원 편집' : '새 크루원';
+      mmName.value = m ? m.name : '';
+      const taken = takenColors(id);
+      const color = (m ? m.color : (COLORS.find(c => !taken[c]) || COLORS[0])).toUpperCase();
+      const palette = COLORS.includes(color) ? COLORS : [color].concat(COLORS);   // 목록에 없는 예전 색도 유지
+      $('#mmColors').innerHTML = palette.map(c => {
+        const who = taken[c];
+        const tip = who ? `${esc(who)}님이 사용 중` : '';
+        return `<label class="sw${who ? ' taken' : ''}" title="${tip}"><input type="radio" name="mmColor" value="${c}"${c === color ? ' checked' : ''}${who ? ' disabled' : ''} aria-label="색 ${c}${tip ? ', ' + tip : ''}"><span style="background:${c}"></span></label>`;
+      }).join('');
+      const accs = m ? m.accessories : [];
+      $('#mmAcc').innerHTML = ACCS.map(([v, label]) =>
+        `<label><input type="checkbox" name="mmAcc" value="${v}"${accs.includes(v) ? ' checked' : ''}><span>${label}</span></label>`
+      ).join('');
+      $('#mmDel').hidden = !m;
+      mmErr.textContent = '';
+      mmPreview();
+      mOverlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      mmName.focus();
+    }
+    function closeMemberModal() {
+      mOverlay.hidden = true;
+      document.body.style.overflow = '';
+      editingMemberId = null;
+    }
+    $('#mmClose').addEventListener('click', closeMemberModal);
+    mOverlay.addEventListener('mousedown', e => { if (e.target === mOverlay) closeMemberModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !mOverlay.hidden) closeMemberModal();
+    });
+    mForm.addEventListener('change', mmPreview);
+
+    mForm.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!cloud) { mmErr.textContent = NO_CLOUD; return; }
+      const name = mmName.value.trim();
+      if (!name) { mmErr.textContent = '이름을 입력해 주세요.'; mmName.focus(); return; }
+      const dup = Object.values(members).some(m => m.id !== editingMemberId && m.name.toLowerCase() === name.toLowerCase());
+      if (dup) { mmErr.textContent = '같은 이름의 크루원이 이미 있어요.'; mmName.focus(); return; }
+      const pick = mmPick();
+      const owner = takenColors(editingMemberId)[pick.color.toUpperCase()];
+      if (owner) { mmErr.textContent = `${owner}님이 이미 쓰는 색이에요. 다른 색을 골라 주세요.`; return; }
+
+      if (editingMemberId && members[editingMemberId]) {
+        const m = members[editingMemberId];
+        Object.assign(m, { name: name, color: pick.color, accessories: pick.accessories });
+        cloudSaveMember(m.id, { name: name, color: pick.color, accessories: pick.accessories }, true);
+      } else {
+        const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const m = { id, name, color: pick.color, accessories: pick.accessories, shoes: [], records: {}, order: Date.now() };
+        members[id] = m;
+        cloudSaveMember(id, { name: name, color: pick.color, accessories: pick.accessories, shoes: [], records: {}, order: m.order });
+        setMe(id);
+      }
+      closeMemberModal();
+      renderAll();
+      renderPanels();
+    });
+
+    $('#mmDel').addEventListener('click', () => {
+      const m = editingMemberId && members[editingMemberId];
+      if (!m) return;
+      if (!cloud) { mmErr.textContent = NO_CLOUD; return; }
+      if (!confirm(`'${m.name}' 크루원과 그 사람의 모든 기록을 삭제할까요?\n되돌릴 수 없어요.`)) return;
+      cloudDeleteMember(m.id);
+      delete members[m.id];
+      if (meId === m.id) meId = null;
+      closeMemberModal();
+      renderAll();
+      renderPanels();
+      ensureMe();
+    });
+
+    /* ---------- 월별 집계 / 순위표 / 경주 / 포디움 ---------- */
+    function monthStats(y, mo) {
+      const pre = `${y}-${pad(mo + 1)}-`;
+      return sortedMembers().map(m => {
+        let dist = 0, count = 0, pd = 0, pw = 0;
+        Object.entries(m.records).forEach(([k, r]) => {
+          if (!k.startsWith(pre) || !r) return;
+          const d = Number(r.dist) || 0;
+          dist += d;
+          count++;
+          if (r.pace) { pd += d; pw += r.pace * d; }
+        });
+        return { m, dist: Math.round(dist * 100) / 100, count, pace: pd > 0 ? Math.round(pw / pd) : 0 };
+      });
+    }
+    // 거리 많은 순 → 동점이면 러닝 횟수 많은 순 → 이름순
+    function ranked(rows) {
+      return rows.slice().sort((a, b) => (b.dist - a.dist) || (b.count - a.count) || a.m.name.localeCompare(b.m.name, 'ko'));
+    }
+
+    function renderCrew() {
+      const rows = monthStats(view.y, view.m);
+      const rk = ranked(rows);
+      $('#crewTitle').textContent = `${view.m + 1}월 크루 순위`;
+
+      const box = $('#standings');
+      if (rk.length === 0) {
+        box.innerHTML = '<p class="empty">아직 크루원이 없어요. 위에서 + 크루원을 눌러 추가해 보세요.</p>';
+      } else {
+        box.innerHTML = `<table>
+          <thead><tr><th class="rk">순위</th><th class="l">크루원</th><th>누적 거리</th><th>러닝 횟수</th><th>평균 페이스</th></tr></thead>
+          <tbody>${rk.map((r, i) => `<tr class="${r.m.id === meId ? 'me' : ''}${r.dist === 0 ? ' zero2' : ''}">
+            <td class="rk">${i + 1}</td>
+            <td class="l"><span class="who">${avatar(r.m)}<span class="nm">${esc(r.m.name)}</span></span></td>
+            <td>${fmtKm(r.dist)} km</td>
+            <td>${r.count}회</td>
+            <td>${r.pace ? fmtPace(r.pace) + ' /km' : '-'}</td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+      }
+      renderRace(rows);
+      renderPodium(rk);
+    }
+
+    // 경주: 줄(레인)은 그대로 두고 위치만 바꿔서, 기록이 바뀌면 캐릭터가 부드럽게 달려가요.
+    const raceEls = {};
+    const RUNNER_W = 34;
+    function runnerLeft(p) { return `calc((100% - ${RUNNER_W}px) * ${p})`; }
+
+    function renderRace(rows) {
+      const box = $('#race');
+      if (rows.length === 0) {
+        box.innerHTML = '<p class="empty">크루원을 추가하면 여기서 경주가 시작돼요.</p>';
+        Object.keys(raceEls).forEach(k => delete raceEls[k]);
+        return;
+      }
+      if (box.querySelector('.empty')) box.innerHTML = '';
+      const max = Math.max(0, ...rows.map(r => r.dist));
+      const alive = new Set(rows.map(r => r.m.id));
+      Object.keys(raceEls).forEach(id => {
+        if (!alive.has(id)) { raceEls[id].lane.remove(); delete raceEls[id]; }
+      });
+
+      rows.forEach((r, i) => {
+        const m = r.m;
+        let el = raceEls[m.id];
+        if (!el) {
+          const lane = document.createElement('div');
+          lane.className = 'lane';
+          lane.innerHTML = '<div class="ln"><b></b><span></span></div><div class="track"><div class="runner"></div></div>';
+          el = raceEls[m.id] = {
+            lane, sig: '',
+            name: lane.querySelector('b'), km: lane.querySelector('.ln span'), runner: lane.querySelector('.runner')
+          };
+          el.runner.style.left = runnerLeft(0);   // 출발선에서 시작
+        }
+        if (box.children[i] !== el.lane) box.insertBefore(el.lane, box.children[i] || null);
+
+        const sig = `${m.color}|${m.accessories.join(',')}|${r.dist > 0}`;
+        if (el.sig !== sig) { el.runner.innerHTML = avatar(m, { run: r.dist > 0 }); el.sig = sig; }
+        el.name.textContent = m.name;
+        el.km.textContent = `${fmtKm(r.dist)} km`;
+        el.lane.setAttribute('aria-label', `${m.name} ${fmtKm(r.dist)}킬로미터`);
+        // 1등이 결승선 직전(92%), 나머지는 거리에 비례
+        const p = max > 0 ? (r.dist / max) * 0.92 : 0;
+        el.target = p;
+        requestAnimationFrame(() => requestAnimationFrame(() => { el.runner.style.left = runnerLeft(el.target); }));
+      });
+    }
+
+    function confettiHtml() {
+      const colors = ['#39FF14', '#F7EC0A', '#0AEBF7', '#FF4D4D', '#F15BB5', '#FFFFFF'];
+      let h = '<div class="confetti" aria-hidden="true">';
+      for (let i = 0; i < 30; i++) {
+        const x = Math.round(Math.random() * 100);
+        const d = (2.6 + Math.random() * 2.4).toFixed(2);
+        const delay = (Math.random() * 3).toFixed(2);
+        h += `<span class="cf" style="left:${x}%;background:${colors[i % colors.length]};animation-duration:${d}s;animation-delay:-${delay}s"></span>`;
+      }
+      return h + '</div>';
+    }
+
+    function renderPodium(rk) {
+      const t = new Date();
+      const diff = (view.y * 12 + view.m) - (t.getFullYear() * 12 + t.getMonth());   // 0 이번 달, 음수 지난 달, 양수 다음 달
+      const top = rk.filter(r => r.dist > 0).slice(0, 3);
+      $('#podiumTitle').textContent = `${view.m + 1}월 포디움`;
+      $('#podiumMsg').textContent = diff > 0 ? '아직 시작 전이에요.'
+        : diff === 0 ? '현재까지의 순위예요. 월말이 지나면 최종 결과로 확정돼요. (동점이면 러닝 횟수가 많은 사람이 앞)'
+        : `${view.y}년 ${view.m + 1}월 최종 결과`;
+
+      const html = [1, 0, 2].map(i => {          // 화면 배치: 2등 · 1등 · 3등
+        const rank = i + 1;
+        const r = top[i];
+        if (!r) return `<div class="pstep p${rank} empty"><div class="block"><span>${rank}</span></div></div>`;
+        return `<div class="pstep p${rank}">`
+          + (rank === 1 ? '<div class="ptag">WINNER</div>' : '')
+          + avatar(r.m, { cheer: true })
+          + `<div class="pname">${esc(r.m.name)}</div><div class="pkm">${fmtKm(r.dist)} km</div>`
+          + `<div class="block"><span>${rank}</span></div></div>`;
+      }).join('');
+      $('#podium').innerHTML = html + (diff < 0 && top.length ? confettiHtml() : '');
+    }
+
     /* ---------- 클라우드 저장 (Firebase Firestore, 실시간) ---------- */
     // 웹용 Firebase 설정값은 공개되어도 되는 값이에요. 실제 접근 제한은 Firebase 보안 규칙이 담당해요.
     const firebaseConfig = {
@@ -907,11 +1460,15 @@
       appId: "1:562064958875:web:eaab599fdfc4bc824aed3e"
     };
     const FB_URL = 'https://www.gstatic.com/firebasejs/10.14.1/';
-    const MIGRATED_FLAG = 'runlog.migrated';   // 예전(이 기기에만 저장하던 버전) 기록을 옮겼는지
     const NO_CLOUD = '클라우드에 연결되지 않아 저장할 수 없어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
-    let cloud = null;            // 연결되면 { fs, ref }
-    let lastApplied = '';        // 마지막으로 화면에 반영한 클라우드 내용
-    let gotServerData = false;   // 서버에서 최신 내용을 한 번이라도 받았는지
+    // 저장 구조
+    //   runlog/main      : 크루 공용 목록 { types, places }  (예전 버전의 기록은 여기서 첫 크루원으로 한 번 옮겨요)
+    //   members/{id}     : 크루원 한 명 { name, color, accessories, shoes, records, order }
+    let cloud = null;                    // 연결되면 { fs, db, mainRef }
+    let lastShared = '', lastMembers = '';
+    let mainRaw = null;                  // runlog/main 의 원본 내용 (이전용)
+    let mainServer = false, membersServer = false, migrating = false;
+    const metas = { main: null, members: null };
 
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 무시 */ } }
@@ -928,8 +1485,15 @@
       el.textContent = texts[state] || '';
       el.className = 'sync' + (state === 'online' ? ' on' : '') + (state === 'denied' ? ' err' : '');
     }
+    function updateSync() {
+      const a = metas.main, b = metas.members;
+      if (!a || !b) { setSync('connecting'); return; }
+      if (a.fromCache || b.fromCache) setSync(mainServer && membersServer ? 'offline' : 'connecting');
+      else if (a.hasPendingWrites || b.hasPendingWrites) setSync('syncing');
+      else setSync('online');
+    }
 
-    // 키 순서와 상관없이 같은 내용이면 같은 문자열이 되도록 (불필요한 화면 갱신 방지)
+    // 키 순서와 상관없이 같은 내용이면 같은 문자열 (불필요한 화면 갱신 방지)
     function stable(v) {
       return JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x))
         ? Object.keys(x).sort().reduce((o, key) => { o[key] = x[key]; return o; }, {})
@@ -937,62 +1501,113 @@
     }
 
     function cloudWrite(op) {
-      return op(cloud.fs, cloud.ref).catch(err => {
+      return Promise.resolve().then(() => op(cloud.fs, cloud)).catch(err => {
         const denied = !!err && err.code === 'permission-denied';
         setSync(denied ? 'denied' : 'offline');
         if (denied) alert('클라우드에 저장하지 못했어요. Firebase 보안 규칙을 확인해 주세요.');
       });
     }
+    const mref = (fs, c, id) => fs.doc(c.db, 'members', id);
 
-    // 화면을 먼저 바꾸고(빠른 반응), 클라우드에 저장. 저장이 거부되면 실시간 수신이 원래 내용으로 되돌려요.
-    function cloudSaveRecord(key) {
-      const rec = data.records[key];
-      cloudWrite((fs, ref) => fs.setDoc(ref, { records: { [key]: rec } }, { merge: true }));
+    // 화면을 먼저 바꾸고(빠른 반응), 클라우드에 저장. 거부되면 실시간 수신이 원래 내용으로 되돌려요.
+    function cloudSaveRecord(id, key) {
+      const rec = members[id].records[key];
+      cloudWrite((fs, c) => fs.setDoc(mref(fs, c, id), { records: { [key]: rec } }, { merge: true }));
     }
-    function cloudDeleteRecord(key) {
-      cloudWrite((fs, ref) => fs.setDoc(ref, { records: { [key]: fs.deleteField() } }, { merge: true }));
+    function cloudDeleteRecord(id, key) {
+      cloudWrite((fs, c) => fs.setDoc(mref(fs, c, id), { records: { [key]: fs.deleteField() } }, { merge: true }));
+    }
+    function cloudSaveShoes(id) {
+      const shoes = members[id].shoes;
+      cloudWrite((fs, c) => fs.setDoc(mref(fs, c, id), { shoes }, { merge: true }));
     }
     function cloudSaveLists() {
-      const lists = { types: data.types, places: data.places, shoes: data.shoes };
-      cloudWrite((fs, ref) => fs.setDoc(ref, lists, { merge: true }));
+      const lists = { types: shared.types, places: shared.places };
+      cloudWrite((fs, c) => fs.setDoc(c.mainRef, lists, { merge: true }));
+    }
+    function cloudSaveMember(id, fields, dropLegacy) {
+      cloudWrite((fs, c) => {
+        const f = Object.assign({}, fields);
+        if (dropLegacy) f.accessory = fs.deleteField();   // 소품이 하나뿐이던 예전 필드 정리
+        return fs.setDoc(mref(fs, c, id), f, { merge: true });
+      });
+    }
+    function cloudDeleteMember(id) {
+      cloudWrite((fs, c) => fs.deleteDoc(mref(fs, c, id)));
     }
 
-    // 클라우드에서 받은 내용을 화면에 반영 (내용이 바뀐 경우에만)
-    function applyCloud(d) {
-      const sig = stable(d);
-      if (sig === lastApplied) return;
-      lastApplied = sig;
-      data.types = Array.isArray(d.types) ? d.types.slice() : DEFAULTS.types.slice();
-      data.shoes = Array.isArray(d.shoes) ? d.shoes.slice() : DEFAULTS.shoes.slice();
-      data.places = Array.isArray(d.places) ? d.places.slice() : DEFAULTS.places.slice();
-      data.records = (d.records && typeof d.records === 'object') ? d.records : {};
+    function normMember(id, d) {
+      const hex = /^#[0-9a-fA-F]{6}$/;
+      return {
+        id,
+        name: String(d.name || '이름없음').slice(0, 12),
+        color: hex.test(d.color) ? d.color.toUpperCase() : COLORS[0],
+        accessories: Array.isArray(d.accessories)
+          ? Array.from(new Set(d.accessories.filter(x => ACC_IDS.includes(x))))
+          : (ACC_IDS.includes(d.accessory) ? [d.accessory] : []),
+        shoes: Array.isArray(d.shoes) ? d.shoes.filter(x => typeof x === 'string') : [],
+        records: (d.records && typeof d.records === 'object') ? d.records : {},
+        order: Number(d.order) || 0
+      };
+    }
+
+    function applyShared(d) {
+      const next = {
+        types: Array.isArray(d && d.types) ? d.types.slice() : DEFAULTS.types.slice(),
+        places: Array.isArray(d && d.places) ? d.places.slice() : DEFAULTS.places.slice()
+      };
+      const sig = stable(next);
+      if (sig === lastShared) return;
+      lastShared = sig;
+      shared = next;
+      renderPanels();
+    }
+
+    function applyMembers(list) {
+      const sig = stable(list);
+      if (sig === lastMembers) return;
+      lastMembers = sig;
+      members = {};
+      list.forEach(m => { members[m.id] = m; });
       renderAll();
-      document.querySelectorAll('.panel').forEach(renderItems);
+      renderPanels();
     }
 
-    // 서버에서 처음 받았을 때 한 번만: 빈 클라우드면 기본 목록을 만들고,
-    // 예전(이 기기에만 저장하던 버전)에 입력한 기록이 있으면 클라우드에 없는 것만 옮겨요.
-    function bootstrap(d) {
-      if (gotServerData) return;
-      gotServerData = true;
-      let old = null;
-      if (lsGet(MIGRATED_FLAG) !== '1' && lsGet('runlog.cloudSynced') !== '1') {
-        try { old = JSON.parse(lsGet(KEY) || 'null'); } catch (e) { old = null; }
+    // 예전(혼자 쓰던) 버전의 기록이 runlog/main 에 있으면 첫 크루원으로 한 번만 옮겨요. (기존 기록은 지우지 않아요)
+    function maybeMigrate() {
+      if (migrating) return Object.keys(members).length === 0;   // 옮긴 크루원이 도착하면 이어서 진행
+      if (Object.keys(members).length > 0 || !mainRaw || mainRaw.migratedAt) return false;
+      const recs = (mainRaw.records && typeof mainRaw.records === 'object') ? mainRaw.records : {};
+      const shoes = Array.isArray(mainRaw.shoes) ? mainRaw.shoes : [];
+      if (Object.keys(recs).length === 0 && shoes.length === 0) return false;
+      migrating = true;
+      const first = { name: '이재열', color: '#4D96FF', accessories: ['band'], shoes, records: recs, order: 1 };
+      cloudWrite((fs, c) => fs.setDoc(mref(fs, c, 'm-origin'), first, { merge: true })
+        .then(() => fs.setDoc(c.mainRef, { migratedAt: Date.now() }, { merge: true })));
+      return true;
+    }
+
+    // 지금 보는 크루원이 없으면: 1명뿐이면 자동 선택, 여러 명이면 "누구세요?", 0명이면 추가 창
+    function ensureMe() {
+      if (!(mainServer && membersServer)) return;
+      const ids = Object.keys(members);
+      if (meId && !members[meId]) meId = null;
+      if (!meId && ids.length === 1) {
+        setMe(ids[0]);
+        renderAll();
+        renderPanels();
+        return;
       }
-      const payload = {};
-      if (!d) {
-        ['types', 'places', 'shoes'].forEach(k => {
-          payload[k] = (old && Array.isArray(old[k])) ? old[k] : DEFAULTS[k].slice();
-        });
-      }
-      if (old && old.records && typeof old.records === 'object') {
-        const have = (d && d.records) || {};
-        const add = {};
-        Object.keys(old.records).forEach(k => { if (!(k in have)) add[k] = old.records[k]; });
-        if (Object.keys(add).length) payload.records = add;
-      }
-      if (Object.keys(payload).length === 0) { lsSet(MIGRATED_FLAG, '1'); return; }
-      cloudWrite((fs, ref) => fs.setDoc(ref, payload, { merge: true }).then(() => lsSet(MIGRATED_FLAG, '1')));
+      const busy = !overlay.hidden || !mOverlay.hidden || !whoOverlay.hidden;
+      if (busy) return;
+      if (!meId && ids.length > 1) openWho();
+      else if (ids.length === 0) openMemberModal(null);
+    }
+
+    function afterSnapshots() {
+      if (!(mainServer && membersServer)) return;
+      if (maybeMigrate()) return;     // 옮기는 중이면 members 스냅샷이 다시 오면서 이어서 처리돼요
+      ensureMe();
     }
 
     async function initCloud() {
@@ -1012,29 +1627,47 @@
         } catch (e) {
           db = fs.getFirestore(app);
         }
-        const ref = fs.doc(db, 'runlog', 'main');
-        cloud = { fs, ref };
+        const mainRef = fs.doc(db, 'runlog', 'main');
+        cloud = { fs, db, mainRef };
 
-        setTimeout(() => { if (!gotServerData) setSync('offline'); }, 6000);
+        setTimeout(() => { if (!(mainServer && membersServer)) setSync('offline'); }, 6000);
 
-        // 실시간 수신: 다른 기기에서 바뀌면 바로 이 화면에도 반영돼요
-        fs.onSnapshot(ref, { includeMetadataChanges: true }, snap => {
-          const d = snap.exists() ? snap.data() : null;
-          const m = snap.metadata;
-          if (!m.fromCache) bootstrap(d);
-          if (d) applyCloud(d);
-          if (m.fromCache) setSync(gotServerData ? 'offline' : 'connecting');
-          else if (m.hasPendingWrites) setSync('syncing');
-          else setSync('online');
-        }, err => {
-          setSync(err && err.code === 'permission-denied' ? 'denied' : 'offline');
-        });
+        const onErr = err => setSync(err && err.code === 'permission-denied' ? 'denied' : 'offline');
+        const opt = { includeMetadataChanges: true };
+
+        // 실시간 수신 1: 크루 공용 목록
+        fs.onSnapshot(mainRef, opt, snap => {
+          metas.main = snap.metadata;
+          mainRaw = snap.exists() ? snap.data() : null;
+          if (!snap.metadata.fromCache) {
+            if (!mainServer) {
+              mainServer = true;
+              if (!snap.exists()) {
+                const lists = { types: DEFAULTS.types.slice(), places: DEFAULTS.places.slice() };
+                cloudWrite((f, c) => f.setDoc(c.mainRef, lists, { merge: true }));
+              }
+            }
+          }
+          applyShared(mainRaw);
+          afterSnapshots();
+          updateSync();
+        }, onErr);
+
+        // 실시간 수신 2: 크루원 전체 (누가 기록하면 모두의 화면에 바로 반영)
+        fs.onSnapshot(fs.collection(db, 'members'), opt, snap => {
+          metas.members = snap.metadata;
+          if (!snap.metadata.fromCache) membersServer = true;
+          applyMembers(snap.docs.map(d => normMember(d.id, d.data())));
+          afterSnapshots();
+          updateSync();
+        }, onErr);
       } catch (e) {
         setSync('offline');
       }
     }
 
     renderAll();
+    renderPanels();
     initCloud();
   })();
   </script>
