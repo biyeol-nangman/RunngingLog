@@ -598,8 +598,13 @@
       </label>
 
       <label class="field">
-        <span class="lbl">신발</span>
+        <span class="lbl">신발 (내 신발 목록)</span>
         <select id="fShoe"></select>
+      </label>
+
+      <label class="field" id="fShoeOtherWrap" hidden>
+        <span class="lbl">새 신발 이름 (저장하면 내 신발 목록에 추가돼요)</span>
+        <input type="text" id="fShoeOther" maxlength="20" placeholder="신발 이름" autocomplete="off">
       </label>
 
       <label class="field">
@@ -880,6 +885,8 @@
     const form = $('#form');
     const fType = $('#fType');
     const fShoe = $('#fShoe');
+    const fShoeOther = $('#fShoeOther');
+    const fShoeWrap = $('#fShoeOtherWrap');
     const fLoc = $('#fLoc');
     const fLocOther = $('#fLocOther');
     const fLocWrap = $('#fLocOtherWrap');
@@ -897,6 +904,23 @@
       items.forEach(v => sel.add(new Option(v, v)));
       sel.value = current || '';
     }
+
+    // 신발: 내 목록에서 고르거나, 바로 새 신발을 입력해서 내 목록에 추가
+    function fillShoe(current) {
+      fShoe.innerHTML = '';
+      fShoe.add(new Option('선택 안 함', ''));
+      const items = data.shoes.slice();
+      if (current && !items.includes(current)) items.push(current);
+      items.forEach(v => fShoe.add(new Option(v, v)));
+      fShoe.add(new Option('+ 새 신발 추가 (직접 입력)', OTHER));
+      fShoe.value = current || '';
+      fShoeOther.value = '';
+      fShoeWrap.hidden = true;
+    }
+    fShoe.addEventListener('change', () => {
+      fShoeWrap.hidden = fShoe.value !== OTHER;
+      if (!fShoeWrap.hidden) fShoeOther.focus();
+    });
 
     function toggleOther() {
       fLocWrap.hidden = fLoc.value !== OTHER;
@@ -940,7 +964,7 @@
 
       form.elements.place.value = rec ? rec.place : 'outdoor';
       fillSelect(fType, data.types, rec ? rec.type : '');
-      fillSelect(fShoe, data.shoes, rec ? rec.shoe : '');
+      fillShoe(rec ? rec.shoe : '');
       fillLoc(rec ? rec.loc : '');
       fDist.value = rec ? fmtKm(rec.dist) : '';
       fPace.value = rec && rec.pace ? fmtPaceInput(rec.pace) : '';
@@ -1016,6 +1040,20 @@
         }
       }
 
+      let shoe = fShoe.value;
+      if (shoe === OTHER) {
+        shoe = fShoeOther.value.trim().slice(0, 20);
+        if (!shoe) {
+          err.textContent = '새 신발 이름을 입력해 주세요.';
+          fShoeOther.focus();
+          return;
+        }
+        if (!me.shoes.includes(shoe)) {      // 내 신발 목록에도 자동으로 추가
+          me.shoes.push(shoe);
+          cloudSaveShoes(me.id);
+        }
+      }
+
       me.records[editingKey] = {
         place: form.elements.place.value === 'indoor' ? 'indoor' : 'outdoor',
         loc: loc,
@@ -1023,7 +1061,7 @@
         dist: Math.round(dist * 100) / 100,
         pace: pace,
         time: time,
-        shoe: fShoe.value,
+        shoe: shoe,
         note: fNote.value.trim().slice(0, 200)
       };
       cloudSaveRecord(me.id, editingKey);
@@ -1139,7 +1177,7 @@
     const ACCS = [['cap', '캡'], ['band', '밴드'], ['shades', '선글라스'], ['longhair', '긴머리']];
     const ACC_IDS = ACCS.map(a => a[0]);
     const SKIN = '#F1E0CC';
-    const HAIR = '#2B1D16';
+    const HAIR = '#B9783A';
 
     // 직접 그린 러너 캐릭터 (색과 소품 여러 개를 겹쳐서 사람마다 다르게)
     function avatar(m, o = {}) {
